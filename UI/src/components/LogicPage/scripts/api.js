@@ -1,4 +1,5 @@
 import axios from "axios"
+import { encrypt } from "../../scripts/crypto";
  
 const api = {
     getAllProcess: () => {
@@ -24,6 +25,9 @@ const api = {
     },
     quickRun: (headers, payload) => {
         return axios.post("https://localhost:7217/dev/workflow/quickrun", encrypt(JSON.stringify(payload), import.meta.env.VITE_SECRET), headers)
+    },
+    upsertProcess: (headers, payload) => {
+        return axios.post("https://localhost:7217/dev/workflow", encrypt(JSON.stringify(payload), import.meta.env.VITE_SECRET), headers)
     }
 }
 

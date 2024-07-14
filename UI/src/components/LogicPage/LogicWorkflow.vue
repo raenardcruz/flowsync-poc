@@ -23,13 +23,13 @@
           <ControlButton title="Reset Transform" @click="resetTransform">
             <span class="material-symbols-outlined">refresh</span>
           </ControlButton>
-          <ControlButton title="Delete" @click="deleteProcess" v-if="!tab.runMode && !tab.isNew">
+          <ControlButton title="Delete" @click="deleteProcess(tab, confirmation, notify)" v-if="!tab.runMode && !tab.isNew">
             <span class="material-symbols-outlined">delete</span>
           </ControlButton>
-          <ControlButton title="Save" @click="save" v-if="!tab.runMode">
+          <ControlButton title="Save" @click="save(tab, notify)" v-if="!tab.runMode">
             <span class="material-symbols-outlined">save</span>
           </ControlButton>
-          <ControlButton title="Run" style="background: #6FA071; color: #fff;" @click="quickrun" v-if="!tab.runMode">
+          <ControlButton title="Run" style="background: #6FA071; color: #fff;" @click="quickrun(tab, notify)" v-if="!tab.runMode">
             <span class="material-symbols-outlined">play_arrow</span>
           </ControlButton>
         </Controls>
@@ -39,7 +39,7 @@
           <span class="material-symbols-outlined" style="color: #0088C2; margin-right: 10px">description</span>
           <span>Show Logs</span>
         </div>
-        <div class="close-btn" @click="exitRunMode">
+        <div class="close-btn" @click="exitRunMode(tab)">
           <span class="material-symbols-outlined" style="color: #BC0F26; margin-right: 10px">cancel</span>
           <span>Exit Run Mode</span>
         </div>
@@ -53,45 +53,30 @@
 Section: Import
 Description: This section defines the imports that this page will be using 
 */
-import { signalRConnection } from "../scripts/functions.js"
 import LogicSideBar from "./components/LogicSideBar.vue"
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { ControlButton, Controls } from '@vue-flow/controls'
-import store from '../store.js'
 import { nodeTypes, edgeTypes } from "./scripts/constants.js"
-import { v4 as uuidv4 } from 'uuid';
-import axios from "axios";
-import { watch, computed, ref } from "vue";
+import { ref } from "vue";
 import LogModal from "./components/LogModal.vue"
-import { encrypt, copyObj } from "../scripts/functions.js"
 import Notif from "../Common/Notif.vue"
 import ConfirmationModal from "../Common/ConfirmationModal.vue"
-import { getAllProcesses, findTab } from "./scripts/functions.js"
 import SignalREvents from "./scripts/signalREvents.js"
 import VueFlowEvents from "./scripts/vueFlowEvents.js"
+import { 
+  findTab, 
+  save,
+  deleteProcess,
+  exitRunMode,
+  quickrun 
+} from "./scripts/functions.js"
 
-/*
-Section: Store and VueFlow constants
-Description: This section contains the centralized function and variable used by vue and vueflow
-*/
 const notify = ref(null);
 const confirmation = ref(null);
 const props = defineProps(['id']);
 
-const {
-  tabs,
-  activeTab,
-  processes } = store();
-
-
 const tab = findTab(props.id);
-
-/*
-Section: Events
-Description: This sections congains the functions related to event actions
-*/
-// Function: This function run when the user connects two nodes
 var signalREvent = new SignalREvents(props.id);
 signalREvent.initializeEvents();
 var vueFlowEvent = new VueFlowEvents(props.id, useVueFlow());
@@ -105,85 +90,6 @@ const handleMouseMove = vueFlowEvent.handleMouseMove;
 const handleKeyDown = vueFlowEvent.handleKeyDown;
 
 const onDragOver = (event) => event.preventDefault();
-
-
-
-/*
-Section: Actions
-Desctiption: This section contains the functions related to button click logics
-*/
-// Function: Saves the current workspace as a process
-const save = function () {
-  var payload = copyObj(tab);
-  payload.components = JSON.stringify({
-      nodes: tab.nodes,
-      edges: tab.edges,
-      variableProfile: tab.variableProfiles
-    })
-
-  axios.post("https://localhost:7217/dev/workflow", encrypt(JSON.stringify(payload), import.meta.env.VITE_SECRET), {
-    headers: {
-      'Content-Type': 'application/json',
-      'runId': tab.id
-    }
-  })
-    .then(() => {
-      tab.isNew = false;
-      getAllProcesses();
-      notify.value.show(`Process Saved`);
-    })
-    .catch(err => {
-      notify.value.show(err, "error");
-    })
-}
-
-// Function: delete the current workspace as a process
-const deleteProcess = function () {
-  confirmation.value.showModal("Delete Confirmation", `Are you sure you want to delete ${tab.name}?`)
-    .then(response => {
-      if (response) {
-        axios.delete(`https://localhost:7217/dev/workflow/${tab.id}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(() => {
-            getAllProcesses();
-            processes.value.splice(processes.value.findIndex(f => f.id == tab.id), 1)
-            activeTab.value = 'main'
-            tabs.value.splice(tabs.value.findIndex(f => f.id == tab.id), 1)
-          })
-          .catch(err => {
-            notify.value.show(err, "error");
-          })
-      }
-    })
-}
-
-// Function: Quick run your process for testing
-const quickrun = function () {
-  tab.runMode = true;
-  tab.logging = [];
-  tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "")
-  var payload = {
-    nodes: tab.nodes,
-    edges: tab.edges
-  };
-  axios.post("https://localhost:7217/dev/workflow/quickrun", encrypt(JSON.stringify(payload), import.meta.env.VITE_SECRET), {
-    headers: {
-      'Content-Type': 'application/json',
-      'runId': tab.id
-    }
-  })
-    .then(response => notify.value.show(response.data))
-    .catch(err => notify.value.show(err, "error"))
-}
-
-// Function: Exit run mode
-const exitRunMode = function () {
-  tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "");
-  tab.runMode = false;
-}
 </script>
 
 <style>

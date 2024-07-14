@@ -107,7 +107,6 @@ const filteredVariables = computed(() => {
         if(tmp.length > 0 )
             selectedVariable.value = 0
         return tmp.map(m => {
-            console.log(tab.variableProfiles.find(f => f.name == m)?.value)
             return {
                 name: m,
                 value: m,
@@ -122,7 +121,6 @@ const filteredVariables = computed(() => {
             if(tmp.length > 0 )
                 selectedVariable.value = 0
             return tmp.map(m => {
-                console.log(tab.variableProfiles.find(f => f.name == m)?.value)
                 return {
                     name: m,
                     value: m,

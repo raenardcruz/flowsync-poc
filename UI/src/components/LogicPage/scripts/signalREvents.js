@@ -18,7 +18,6 @@ export default class SignalREvents {
         });
         signalRConnection.on("log", (log) => {
             if (this.tab.id == log.runId) {
-              console.log(log)
               this.tab.logging.push(log);
             }
         });

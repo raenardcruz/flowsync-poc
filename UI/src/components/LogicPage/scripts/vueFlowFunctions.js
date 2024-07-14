@@ -1,11 +1,37 @@
 import api from "./api";
 import { getAllProcesses } from "./processFunctions";
 import store from "../../store";
+import { encrypt } from "../../scripts/crypto";
 
 const { processes, activeTab, tabs } = store()
 
-const deleteProcess = function (tab, confirmation, notify) {
-    confirmation.value.showModal("Delete Confirmation", `Are you sure you want to delete ${tab.name}?`)
+const save = (tab, notify) => {
+    var payload = copyObj(tab);
+    payload.components = JSON.stringify({
+        nodes: tab.nodes,
+        edges: tab.edges,
+        variableProfile: tab.variableProfiles
+    })
+    var headers = {
+      headers: {
+        'Content-Type': 'application/json',
+        'runId': tab.id
+      }
+    }
+  
+    api.upsertProcess(headers, payload)
+      .then(() => {
+        tab.isNew = false;
+        getAllProcesses();
+        notify.show(`Process Saved`);
+      })
+      .catch(err => {
+        notify.show(err, "error");
+      })
+}
+
+const deleteProcess = (tab, confirmation, notify) => {
+    confirmation.showModal("Delete Confirmation", `Are you sure you want to delete ${tab.name}?`)
       .then(response => {
         if (response) {
           api.deleteProcess(tab.id)
@@ -16,13 +42,13 @@ const deleteProcess = function (tab, confirmation, notify) {
               tabs.value.splice(tabs.value.findIndex(f => f.id == tab.id), 1)
             })
             .catch(err => {
-              notify.value.show(err, "error");
+              notify.show(err, "error");
             })
         }
       })
   }
 
-const quickrun = function (tab, notify) {
+const quickrun = (tab, notify) => {
     tab.runMode = true;
     tab.logging = [];
     tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "")
@@ -36,12 +62,12 @@ const quickrun = function (tab, notify) {
             'runId': tab.id
         }
     }
-    api.quickRun(headers, encrypt(JSON.stringify(payload), import.meta.env.VITE_SECRET))
-        .then(response => notify.value.show(response.data))
-        .catch(err => notify.value.show(err, "error"))
+    api.quickRun(headers, payload)
+        .then(response => notify.show(response.data))
+        .catch(err => notify.show(err, "error"))
 }
 
-const exitRunMode = function (tab) {
+const exitRunMode = (tab) => {
     tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "");
     tab.runMode = false;
 }
@@ -50,5 +76,6 @@ const exitRunMode = function (tab) {
   export {
     deleteProcess,
     quickrun,
-    exitRunMode
+    exitRunMode,
+    save
   }

@@ -49,7 +49,6 @@ export default class VueFlowEvents {
           return;
         changes.forEach(change => {
           if (change.type == "remove") {
-            console.log(`Removing nodes from ${this.tab.id} active Tab ${activeTab.value}`)
             this.tab.nodes.splice(this.tab.nodes.findIndex(f => f.id == change.id), 1)
           } else if (change.type == "position") {
             if (change.position != null) this.tab.nodes.find(f => f.id == change.id).position = copyObj(change.position)
