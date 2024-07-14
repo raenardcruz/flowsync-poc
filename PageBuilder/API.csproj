@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Builder.Common\Builder.Common.csproj" />
+    <ProjectReference Include="..\Builder.Database\Builder.Database.csproj" />
+    <ProjectReference Include="..\Builder.Main\Builder.Main.csproj" />
+    <ProjectReference Include="..\Builder.Models\Builder.Models.csproj" />
+    <ProjectReference Include="..\Builder.SignalR\Builder.SignalR.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,40 @@
+.input {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.input label {
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.input input,
+.input select {
+    border-radius: 20px;
+    padding: 5px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    overflow: auto;
+}
+.input .textbox {
+    border-radius: 20px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    background-color: #fff;
+}
+.input input:focus,
+.input select:focus,
+.input textarea:focus {
+    outline: none;
+    border: 0.05px solid #1092B3;
+}
+
+.input textarea {
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    overflow: auto;
+}
