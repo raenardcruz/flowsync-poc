@@ -78,6 +78,11 @@ const iconStyles = [
         name: "image",
         icon: "imagesmode",
         color: "#98BC18"
+    },
+    {
+        name: "subprocess",
+        icon: "account_tree",
+        color: "#1986BD"
     }
 ]
 

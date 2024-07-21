@@ -116,6 +116,10 @@ namespace Builder.Common
                         case "image":
                             newObj["value"] = node.Data["value"];
                             break;
+
+                        case "subprocess":
+                            newObj["value"] = node.Data["value"];
+                            break;
                     }
 
                     transformedObj.Add(newObj);

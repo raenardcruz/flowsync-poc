@@ -1,20 +1,31 @@
 <template>
     <div class="process-content">
-        <div class="page-title">Process Gallery</div>
-        <div class="page-info">
-            <span>Showing</span>
-            <span style="color: #3990C5;">2</span>
-            <span>out of 2 Processes</span>
+        <div class="filter-box">
+            <div class="filter-title">Tags</div>
+            <div class="filter-search">
+                <input class="search-box" type="search" placeholder="Search" v-model="searchTags">
+            </div>
+            <div class="filter-checks">
+                <span v-for="tag in filteredTags" :key="tag.name">
+                    <CheckBox class="check" :label="tag.name" v-model="tag.value" />
+                </span>
+            </div>
         </div>
-        <div class="search">
-            <input class="search-box" type="text" placeholder="Search">
-            <div class="search-btn">Search</div>
-        </div>
-        <div class="cards-gallery">
+        <div class="gallery-box">
+            <div class="page-title">Process Gallery</div>
+            <div class="page-info">
+                <span>Showing</span>
+                <span style="color: #3990C5;">{{ filterdProcesses.length }}</span>
+                <span>out of {{ processes.length }} Processes</span>
+            </div>
+            <div class="gallery-search">
+                <input class="search-box" type="search" placeholder="Search" v-model="search">
+            </div>
+            <div class="cards-gallery">
                 <div class="create" @click="newProcess()">
                     <span class="material-symbols-outlined">add</span>
                 </div>
-                <div class="card" v-for="process in processes" :key="process.id" @click="selectTab(process.id)">
+                <div class="card" v-for="process in filterdProcesses" :key="process.id" @click="selectTab(process.id)">
                     <div class="type">
                         <span
                             style="color: #14BF47; margin-right: 10px;"
@@ -44,16 +55,52 @@
                         <span>{{ process.title }}</span>
                     </div>
                     <div class="card-description">{{ process.description }}</div>
+                    <div class="tags">
+                        <div class="tag" v-for="tab in process.tags">{{ tab }}</div>
+                    </div>
                 </div>
             </div>
+        </div>
     </div>
 </template>
 
 <script setup>
+import CheckBox from "../Common/CheckBox.vue";
+import { copyObj } from "../scripts/helper";
 import store from "../store"
 import { getAllProcesses, selectTab, newProcess } from "./scripts/functions"
+import { ref, computed, watch } from "vue"
 
-const { processes } = store();
+const { processes, tags } = store();
+const search = ref("")
+const searchTags = ref("")
+const filteredTags = computed(() => {
+    if (searchTags.value.length > 0)
+        return tags.value.filter(f => f.name.toLowerCase().includes(searchTags.value.toLowerCase()));
+    else
+        return tags.value;
+});
+const filterdProcesses = computed(() => {
+    if (search.value.length > 0) {
+        return processes.value.filter(f => 
+                    (f.title.toLowerCase().includes(search.value.toLowerCase()) || 
+                    f.type.toLowerCase().includes(search.value.toLowerCase()) ||
+                    f.description.toLowerCase().includes(search.value.toLowerCase())) && tagFilter(f))
+    }
+    else {
+        return processes.value.filter(f => {
+           return tagFilter(f)   
+        })
+    }
+})
+const tagFilter = (obj) => {
+    if (obj.tags.length > 0) {
+        var tmp = new Set(tags.value.filter(f => f.value == true).map(m => m.name))
+        return obj.tags.some(val => tmp.has(val))
+    } else {
+        return tags.value.find(f => f.name == "No Tags").value
+    }
+}
 getAllProcesses();
 </script>
 
@@ -61,124 +108,176 @@ getAllProcesses();
 .process-content {
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 20px;
     height: 100%;
     width: 100%;
+    padding: 30px;
     background: #f0f0f0;
 
 }
-.page-title {
+.filter-box {
     position: relative;
     display: flex;
-    font-size: 32px;
-    margin: 14px 0 0 174px;
+    align-items: flex-center;
+    justify-content: flex-start;
+    flex-direction: column;
+    border: 1px solid #fff;
+    border-radius: 8px;
+    width: 12%;
+    padding: 10px;
+    overflow: auto;
+}
+.filter-box .filter-title {
+    color: #797272;font-weight: 500;
+}
+.filter-search {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 20px;
+    border-radius: 20px;
+    margin-top: 10px;
+    box-shadow: 4px 4px 4px grey;
+}
+.filter-search .search-box {
+    height: 100%;
+    border-radius: 20px;
+    padding: 0 10px 0 10px;
+    border: none;
+    width: inherit;
+}
+.filter-search .search-box:focus-visible {
+    outline: none;
+}
+.filter-box .filter-checks {
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-self: flex-start;
+    flex-direction: column;
+    margin-top: 30px;
+}
+.filter-box .filter-checks .check {
+    margin-top: 10px;
+}
+.gallery-box {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+    border: 1px solid #fff;
+    border-radius: 8px;
+    width: 85%;
+    padding: 30px;
+}
+.page-title {
+    font-size: 41px;
     color: #797272;
 }
 .page-info {
-    position: relative;
-    display: flex;
-    gap: 5px;
-    font-size: 12px;
+    font-size: 15px;
     color: #AD9A9A;
-    margin: 10px 0 0 174px;
 }
-.search {
+.page-info *  {
+    margin-right: 5px;
+}
+.gallery-search {
     position: relative;
     display: flex;
-    margin: 14px 0 0 174px;
-}
-.search .search-box {
-    border-radius: 20px;
-    border: none;
+    width: 100%;
     height: 30px;
-    width: 460px;
-    box-shadow: 0px 4px 4px grey;
-    padding: 5px 20px 5px 20px;
+    border-radius: 20px;
+    margin-top: 30px;
+    box-shadow: 4px 4px 4px grey;
 }
-.search .search-box:focus-visible {
+.gallery-search .search-box {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    padding: 0 10px 0 10px;
+    border: none;
+}
+.gallery-search .search-box:focus-visible {
     outline: none;
-}
-.search .search-btn {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
-    border: none;
-    height: 30px;
-    width: 123px;
-    font-size: 13px;
-    background: #3990C5;
-    color: #fff;
-    margin-left: 10px;
-    cursor: pointer;
-    transition: 0.3s linear;
-}
-.search .search-btn:hover {
-    filter: brightness(1.2);
 }
 .cards-gallery {
     position: relative;
     display: flex;
-    margin: 50px 174px 0 174px;
     flex-wrap: wrap;
-    gap: 25px;
+    margin-top: 30px;
+    gap: 20px;
 }
 .cards-gallery .create {
     position: relative;
     display: flex;
+    height: 130px;
+    width: 250px;
     justify-content: center;
     align-items: center;
-    height: 154px;
-    width: 269px;
+    border-radius: 8px;
     background: #D9D9D9;
-    border-radius: 10px;
+    color: #8E8B8B;
     cursor: pointer;
-    transition: 0.3s linear;
+    overflow: hidden;
+    transition: 0.3s ease-in-out;
 }
 .cards-gallery .create:hover {
-    box-shadow: 0px 4px 4px grey;
-}
-.cards-gallery .create .material-symbols-outlined {
-    font-size: 64px;
-    color: #8E8B8B;
+    box-shadow: 4px 4px 4px grey;
 }
 .cards-gallery .card {
     position: relative;
     display: flex;
+    height: 130px;
+    width: 250px;
+    padding: 10px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 154px;
-    width: 269px;
-    border-radius: 10px;
-    cursor: pointer;
+    border-radius: 8px;
     background: #fff;
-    box-shadow: 0px 4px 4px grey;
-    transition: 0.3s linear;
-    padding: 20px;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 2px 2px 2px grey;
+    transition: 0.3s ease-in-out;
 }
 .cards-gallery .card:hover {
-    transform: scale(1.02);
-    box-shadow:  6px 6px 20px #868686,
-             -6px -6px 20px #ffffff;
+    box-shadow: 6px 6px 6px rgb(116, 116, 116);
 }
-.cards-gallery .card .card-title {
-    font-size: 20px;
-}
-.cards-gallery .card .card-description {
-    font-size: 13px;
-    color: #868686;
-}
-.type {
+.cards-gallery .card .type {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-.type .type-text {
-    font-size: 13px;
-    color: gray;
+    font-size: 10px;
     text-transform: uppercase;
+}
+.cards-gallery .card .card-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+.cards-gallery .card .card-description {
+    font-size: 10px;
+    color: grey;
+}
+.tags {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.tags .tag {
+    position: relative;
+    display: flex;
+    font-size: 10px;
+    padding: 0 10px 0 10px;
+    background: #3489CD;
+    border-radius: 20px;
+    color: #fff;
 }
 </style>

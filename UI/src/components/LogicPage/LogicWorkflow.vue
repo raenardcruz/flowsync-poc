@@ -3,6 +3,19 @@
     <div class="title-section">
       <div class="title">
         <input type="text" v-model="tab.name" placeholder="Enter Process Title">
+        <div class="tags">
+          <div class="tag btn" @click="tab.tags.push('')">
+            <span class="material-symbols-outlined">add</span>
+            <span>Add Tag</span>
+          </div>
+          <div class="tag" style="background: #0088C2;" v-for="(tag, index) in tab.tags">
+            <input type="text" placeholder="New Tag" v-model="tab.tags[index]" :list="tab.tags[index]" >
+            <datalist :id="tab.tags[index]">
+              <option :value="tag.name" v-for="tag in tags.filter(f => f.name != 'No Tags')"></option>
+            </datalist>
+            <span class="material-symbols-outlined" style="color: #BC0F26;" @click="tab.tags.splice(index, 1)">close</span>
+          </div>
+        </div>
       </div>
       <div class="description">
         <input type="text" v-model="tab.description" placeholder="Enter Description">
@@ -53,6 +66,7 @@
 Section: Import
 Description: This section defines the imports that this page will be using 
 */
+import store from "../store.js"
 import LogicSideBar from "./components/LogicSideBar.vue"
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
@@ -71,6 +85,8 @@ import {
   exitRunMode,
   quickrun 
 } from "./scripts/functions.js"
+
+const { tags } = store()
 
 const notify = ref(null);
 const confirmation = ref(null);
@@ -115,7 +131,43 @@ const onDragOver = (event) => event.preventDefault();
   padding: 10px 0px 10px 20px;
   box-shadow: 0 5px 5px grey;
 }
-
+.title-section .title {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+}
+.title-section .title .tags {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  gap: 5px;
+  width: fit-content;
+}
+.title-section .title .tags .tag {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  font-size: 15px;
+  border-radius: 20px;
+  padding: 2px 10px 2px 10px;
+  cursor: pointer;
+  box-shadow: 3px 3px 5px #868686, -3px -3px 5px #ffffff;
+}
+.title-section .title .tags .tag input {
+  color: #fff;
+  width: fit-content;
+  font-size: 15px;
+  height: 15px;
+}
+.title-section .title .tags .tag.btn:hover {
+  box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #ffffff;
+}
 .title-section .title input {
   font-size: 30px;
   field-sizing: content;

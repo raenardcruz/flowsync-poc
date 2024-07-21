@@ -10,6 +10,7 @@ const showSideBar = ref(false);
 const activeTab = ref('main');
 const tabs = ref([]);
 const processes = ref([]);
+const tags =ref([]);
 
 export default function store() {
   return {
@@ -19,6 +20,7 @@ export default function store() {
     showSideBar,
     activeTab,
     tabs,
-    processes
+    processes,
+    tags
   }
 }

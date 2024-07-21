@@ -5,7 +5,7 @@ import defaultTab from "./defaultTabConstant.js"
 import startNodeTemplate from "./startNodeTemplateConstant.js"
 import { v4 as uuidv4 } from 'uuid'
 
-const { processes, tabs, activeTab } = store() 
+const { processes, tabs, activeTab, tags } = store() 
 
 const getAllProcesses = function () {
     processes.value = []
@@ -16,11 +16,22 @@ const getAllProcesses = function () {
         decryptedList.forEach(process => {
             processes.value.push(process);
         })
+        tags.value = [...new Set(processes.value.map(m => m.tags).flat().filter(f => f != null))].map(m => {
+            return {
+                name: m,
+                value: true
+            }
+        })
+        tags.value.push({
+            name: "No Tags",
+            value: true
+        })
+        tags.value = tags.value.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
     })
     .catch(err => alert(err))
 }
 
-const selectTab = function (tabId) {
+const selectTab = function (tabId, runMode = false, logging = []) {
     if (tabs.value.findIndex(f => f.id == tabId) > -1) {
         activeTab.value = tabId;
         return;
@@ -32,7 +43,8 @@ const selectTab = function (tabId) {
         var tabTemplate = copyObj(defaultTab);
         for (let key in decrypted) {
             if (tabTemplate.hasOwnProperty(key)) {
-                tabTemplate[key] = decrypted[key];
+                if (decrypted[key] != null)
+                    tabTemplate[key] = decrypted[key];
             }
         }
         tabTemplate.isNew = false;
@@ -41,6 +53,11 @@ const selectTab = function (tabId) {
         tabTemplate.nodes = vueFlowObj.nodes?.length > 0 ? [...vueFlowObj.nodes] : [];
         tabTemplate.edges = vueFlowObj.edges?.length > 0 ? [...vueFlowObj.edges] : [];
         tabTemplate.variableProfiles = vueFlowObj.variableProfile?.length > 0 ? [...vueFlowObj.variableProfile] : [];
+        if (runMode) {
+            tabTemplate.runMode = true;
+            tabTemplate.runComplete = true;
+            tabTemplate.logging = logging;
+        }
         tabs.value.push(tabTemplate);
         activeTab.value = tabTemplate.id;
     })

@@ -1,7 +1,7 @@
 import api from "./api";
 import { getAllProcesses } from "./processFunctions";
 import store from "../../store";
-import { encrypt } from "../../scripts/crypto";
+import { copyObj } from "../../scripts/helper";
 
 const { processes, activeTab, tabs } = store()
 
@@ -18,7 +18,6 @@ const save = (tab, notify) => {
         'runId': tab.id
       }
     }
-  
     api.upsertProcess(headers, payload)
       .then(() => {
         tab.isNew = false;
@@ -51,6 +50,7 @@ const deleteProcess = (tab, confirmation, notify) => {
 const quickrun = (tab, notify) => {
     tab.runMode = true;
     tab.logging = [];
+
     tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "")
     var payload = {
         nodes: tab.nodes,

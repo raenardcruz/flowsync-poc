@@ -46,6 +46,7 @@ const toggle = () => {
         align-items: center;
         height: 20px;
         width: 40px;
+        min-width: 40px;
         border-radius: 20px;
         background: #f0f0f0;
         box-shadow: inset 5px 5px 10px #606060,

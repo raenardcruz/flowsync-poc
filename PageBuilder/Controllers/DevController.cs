@@ -41,7 +41,7 @@ namespace PageBuilder.Controllers
                 return NotFound($"Webhook {name}-{id} not found");
             else
             {
-                WorkflowProcessor processor = new WorkflowProcessor(Guid.NewGuid().ToString(), _notifyService);
+                WorkflowProcessor processor = new WorkflowProcessor(Guid.NewGuid().ToString(), _notifyService, config);
                 processor.variables["currentdata"] = JToken.Parse(payload.ToString());
                 var currentData = await processor.ProcessSteps(response.components);
                 return Ok(currentData.ToString().ToJsonObject());
@@ -60,7 +60,7 @@ namespace PageBuilder.Controllers
         public async Task<ActionResult> BuilderRun([FromHeader] string runId, [FromBody] string encodedString)
         {
             _logger.Log(LogLevel.Information, "Workflow Started");
-            WorkflowProcessor processor = new WorkflowProcessor(runId, _notifyService);
+            WorkflowProcessor processor = new WorkflowProcessor(runId, _notifyService, config);
             Task.Run(() => processor.ProcessSteps(encodedString.Decrypt(config.secret)));
             return Ok("Background process running");
         }
@@ -111,6 +111,7 @@ namespace PageBuilder.Controllers
                     id = s.id,
                     title = s.name,
                     description = s.description,
+                    tags = (s.tags != null) ? s.tags : [],
                     type = s.type
                 };
             });

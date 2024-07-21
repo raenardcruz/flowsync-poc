@@ -19,4 +19,5 @@ public class ProcessesDBModel
     public string createdBy { get; set; }
     public DateTime updatedOn { get; set; }
     public string updatedBy { get; set; }
+    public string[] tags { get; set; }
 }

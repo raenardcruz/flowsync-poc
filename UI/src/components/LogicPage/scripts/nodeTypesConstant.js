@@ -15,6 +15,7 @@ import MapNode from "../nodes/MapNode.vue";
 import ReplaceNode from "../nodes/ReplaceNode.vue";
 import RegexFindNode from "../nodes/RegexFindNode.vue";
 import ImageNode from "../nodes/ImageNode.vue";
+import SubProcessNode from "../nodes/SubProcessNode.vue";
 
 const nodeTypes = {
     start: StartNode,
@@ -33,7 +34,8 @@ const nodeTypes = {
     map: MapNode,
     replace: ReplaceNode,
     regexfind: RegexFindNode,
-    image: ImageNode
+    image: ImageNode,
+    subprocess: SubProcessNode
 };
 
 export default nodeTypes;

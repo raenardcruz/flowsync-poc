@@ -16,7 +16,7 @@
                         <span v-if="node.label.length > 0">{{ node.label }}</span>
                         <span v-else>{{ type }}</span>
                     </span>
-                    <div class="edit-btn" @click="edit = !edit">
+                    <div class="edit-btn" @click="save">
                         <span class="material-symbols-outlined" v-if="edit" style="font-size: 8px;">save</span>
                         <span class="material-symbols-outlined" v-else style="font-size: 8px;">edit</span>
                     </div>
@@ -42,6 +42,7 @@
             <div v-for="message in log?.messages" :key="message">
                 <div v-html="displayText(message)"></div>
             </div>
+            <slot name="test"></slot>
         </div>
     </div>
 </template>
@@ -70,17 +71,16 @@ onNodeDragStop((event) => {
     if (event.node.id == props.id) {
         tab.nodes.filter(f => f.id == node.id)[0].position = event.node.position;
     }
-        
 })
-const nodeClicked = function () {
+const nodeClicked = () => {
     removeSelectedNodes(getSelectedNodes.value);
     addSelectedNodes([node]);
 }
-const nodeHover = function () {
+const nodeHover = () => {
     if (tab.runMode)
         showLog.value = true
 }
-const iconColor = function (type) {
+const iconColor = (type) => {
     var filterStyle = iconStyles.filter(f => f.name == type);
     if (filterStyle.length > 0)
         return filterStyle[0];
@@ -90,7 +90,7 @@ const iconColor = function (type) {
             color: "#fff"
         }
 }
-const displayText = function (text) {
+const displayText = (text) => {
     if (text == null)
         return "";
     if (text.length > 300) {
@@ -100,6 +100,10 @@ const displayText = function (text) {
     } else {
         return text;
     }
+}
+const save = () => {
+    edit.value = !edit.value;
+    tab.nodes.find(f => f.id == node.id).label = node.label;
 }
 </script>
 

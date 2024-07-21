@@ -133,6 +133,13 @@ const nodeTemplates = [
             status: "",
             value: ""
         }
+    },
+    {
+        id: '', type: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
+        data: {
+            status: "",
+            value: ""
+        }
     }
 ]
 

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Builder.Common\Builder.Common.csproj" />
+    <ProjectReference Include="..\Builder.Database\Builder.Database.csproj" />
     <ProjectReference Include="..\Builder.Models\Builder.Models.csproj" />
     <ProjectReference Include="..\Builder.SignalR\Builder.SignalR.csproj" />
     <ProjectReference Include="..\Builder.Steps\Builder.Steps.csproj" />

@@ -11,7 +11,8 @@ const nodeGroups = [
             "list",
             "count",
             "replace",
-            "regexfind"
+            "regexfind",
+            "subprocess"
         ]
     },
     {

@@ -4,6 +4,7 @@ using Builder.Common;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using Builder.SignalR;
+using Builder.Database;
 
 namespace Builder.Main
 {
@@ -15,12 +16,14 @@ namespace Builder.Main
         public Dictionary<string, object> variables = new Dictionary<string, object>();
         private LogicHub _hub;
         private string _runId;
-        public WorkflowProcessor(string runId, NotifyService notifyService)
+        private ConfigModel _config;
+        public WorkflowProcessor(string runId, NotifyService notifyService, ConfigModel config)
         {
             _runId = runId;
             _hub = new LogicHub();
             variables["currentdata"] = "";
             _notifyService = notifyService;
+            _config = config;
         }
         public async Task<object> ProcessSteps(string json)
         {
@@ -262,6 +265,21 @@ namespace Builder.Main
                             variables["currentdata"] = imageValue;
                             logModel.output = imageValue;
                             logModel.messages.Add($"URL: {imageValue}");
+                            await _notifyService.StepProgress(_runId, stepId, "success");
+                            break;
+
+                        case "subprocess":
+                            await _notifyService.StepProgress(_runId, stepId, "running");
+                            string subProcValue = ReplaceVariables(step["value"].ToString());
+                            var process = new ProcessesDB(_config.mongoDB.connectionString, _config.mongoDB.databaseName);
+                            var model = await process.Read(subProcValue);
+                            var vueFlowObj = JToken.Parse(model.components);
+                            var workflow = SharedMethods.BuildJsonSteps(
+                                            vueFlowObj["nodes"].ToObject<List<VueFlowNode>>(),
+                                            vueFlowObj["edges"].ToObject<List<VueFlowEdge>>());
+                            await ProcessSteps(workflow);
+                            logModel.output = variables["currentdata"];
+                            logModel.messages.Add($"Process {subProcValue} was executed successfully");
                             await _notifyService.StepProgress(_runId, stepId, "success");
                             break;
                     }
