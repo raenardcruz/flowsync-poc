@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const { processes, tabs, activeTab, tags } = store() 
 
-const getAllProcesses = function () {
+const getAllProcesses = () => {
     processes.value = []
     api.getAllProcess()
     .then(response => {
@@ -31,11 +31,7 @@ const getAllProcesses = function () {
     .catch(err => alert(err))
 }
 
-const selectTab = function (tabId, runMode = false, logging = []) {
-    if (tabs.value.findIndex(f => f.id == tabId) > -1) {
-        activeTab.value = tabId;
-        return;
-    }
+const selectTab = (tabId, runMode = false, logging = [], statuses = [], logPaths = []) => {
     api.getProcess(tabId)
     .then(response => {
         var decryptedStr = decrypt(response.data, import.meta.env.VITE_SECRET);
@@ -57,14 +53,18 @@ const selectTab = function (tabId, runMode = false, logging = []) {
             tabTemplate.runMode = true;
             tabTemplate.runComplete = true;
             tabTemplate.logging = logging;
+            tabTemplate.statuses = statuses;
+            tabTemplate.logPaths = logPaths;
         }
+        if (tabs.value.filter(f => f.id == tabId).length > 0)
+            tabs.value.splice(tabs.value.findIndex(f => f.id == tabId), 1)
         tabs.value.push(tabTemplate);
         activeTab.value = tabTemplate.id;
     })
     .catch(err => alert(err))
 }
 
-const newProcess = function () {
+const newProcess = () => {
     var id = uuidv4();
     var startNode =  copyObj(startNodeTemplate);
     startNode.tabId = id;
@@ -75,8 +75,22 @@ const newProcess = function () {
     activeTab.value = id;
 }
 
+const selectAllTag = () => {
+    tags.value.forEach(tag => {
+        tag.value = true
+    })
+}
+
+const deselectAllTag = () => {
+    tags.value.forEach(tag => {
+        tag.value = false
+    })
+}
+
 export {
     getAllProcesses,
     selectTab,
-    newProcess
+    newProcess,
+    selectAllTag,
+    deselectAllTag
 }

@@ -1,5 +1,5 @@
 <template>
-    <BaseEdge :id="id" :style="style" :path="path[0]" :marker-end="markerEnd" />
+    <BaseEdge :id="id" :style="edgeStyling" :path="path[0]" :marker-end="markerEnd" />
     <EdgeLabelRenderer>
         <div :style="{
             pointerEvents: 'all',
@@ -14,13 +14,12 @@
 </template>
 
 <script setup>
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow, useEdge } from '@vue-flow/core'
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, useVueFlow, useEdge } from '@vue-flow/core'
 import { computed } from 'vue'
 import store from "../../store"
 
 const { edge } = useEdge();
-const {tabs} = store();
-var tab = computed(() => tabs.value.find(f => f.id == edge.tabId));
+const { tabs } = store();
 
 const props = defineProps({
     id: {
@@ -63,27 +62,61 @@ const props = defineProps({
 
 const { removeEdges } = useVueFlow()
 
-const path = computed(() => getBezierPath(props))
+var tab = computed(() => tabs.value.find(f => f.id == edge.tabId));
+var pathRan = computed(() => {
+    return tab.value.logPaths.filter(f => f.source == edge.source && f.target == edge.target).length > 0;
+})
+var edgeStyling = computed(() => {
+    if (tab.value.runMode) {
+        if (pathRan.value)
+            return ({
+                ...props.style,
+                stroke: 'black',
+                strokeWidth: 3
+            })
+        else
+                return ({
+                    ...props.style,
+                    stroke: '#C0BFBF',
+                    strokeWidth: 1
+                })
+    } else
+        return ({
+                    ...props.style,
+                    stroke: 'grey'
+                })
+})
+const path = computed(() => getSmoothStepPath({
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    targetX: props.targetX,
+    targetY: props.targetY,
+    sourcePosition: props.sourcePosition,
+    targetPosition: props.targetPosition,
+}))
 </script>
 
 <style scoped>
 button {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: red;
-    background: none;
+    background: #fff;
     border: none;
     cursor: pointer;
-    transition: 0.5s;
+    transition: all 0.3s ease-in-out;
     width: 15px;
     height: 15px;
+    border-radius: 90px;
 }
-button:hover::before {
-    content: 'remove';
-    position: absolute;
+button:hover {
+    background: red;
     color: #fff;
-    font-size: 10px;
-    top: -10px;
-    padding: 3px;
-    background: #222;
-    border-radius: 20px;
+    box-shadow: 0 0 4px red, 0 0 8px red, 0 0 12px red;
+}
+button span {
+    font-size: 20px;
 }
 </style>

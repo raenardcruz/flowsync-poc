@@ -18,5 +18,10 @@ namespace Builder.SignalR
         {
             await Clients.All.SendAsync("processComplete", runId);
         }
+
+        public async Task logPath(string runId, string source, string target)
+        {
+            await Clients.All.SendAsync("logPath", runId, source, target);
+        }
     }
 }

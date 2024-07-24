@@ -20,6 +20,11 @@ namespace Builder.SignalR
             await _hubContext.Clients.All.SendAsync("log", log);
         }
 
+        public async Task LogPath(string runId, string source, string target)
+        {
+            await _hubContext.Clients.All.SendAsync("logPath", runId, source, target);
+        }
+
         public async Task ProcessComplete(string runId)
         {
             await _hubContext.Clients.All.SendAsync("processComplete", runId);

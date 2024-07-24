@@ -1,4 +1,4 @@
-import { getAllProcesses, selectTab, newProcess } from "./processFunctions"
+import { getAllProcesses, selectTab, newProcess, selectAllTag, deselectAllTag } from "./processFunctions"
 import { findTab } from "./tabFunctions"
 import { save, deleteProcess, exitRunMode, quickrun } from "./vueFlowFunctions"
 
@@ -10,5 +10,7 @@ export {
     save,
     deleteProcess,
     exitRunMode,
-    quickrun
+    quickrun,
+    selectAllTag,
+    deselectAllTag
 }

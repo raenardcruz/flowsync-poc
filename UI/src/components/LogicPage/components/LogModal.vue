@@ -1,31 +1,35 @@
 <template>
     <div class="background">
         <div class="modal">
-            <span class="material-symbols-outlined close-btn" @click="tab.showLogModal = false">close</span>
-            <h4 style="margin-bottom: 20px;">Logs</h4>
-            <table>
-                <tr>
-                    <th>Execution Date</th>
-                    <th>Step Id</th>
-                    <th>Step</th>
-                    <th>Messages</th>
-                </tr>
-                <tr v-for="log in tab.logging.sort((a, b) => new Date(b.dateTime) - new Date(a.dataTime))" :key="log">
-                    <td>{{ utcDateToLocal(log.dateTime) }}</td>
-                    <td>{{ log.stepId }}</td>
-                    <td>
-                        <span>{{log.label}}</span>
-                         <span>({{ log.type }})</span>
-                    </td>
-                    <td>
-                        <ul>
-                            <li v-for="logmessage in log.messages" :key="logmessage">
-                                <span v-html="displayText(logmessage)"></span>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            </table>
+            <div class="modal-header">
+                <span class="material-symbols-outlined close-btn" @click="tab.showLogModal = false">close</span>
+                <h4 style="margin-bottom: 20px;">Logs</h4>
+            </div>
+            <div class="modal-content">
+                <table>
+                    <tr>
+                        <th>Execution Date</th>
+                        <th>Step Id</th>
+                        <th>Step</th>
+                        <th>Messages</th>
+                    </tr>
+                    <tr v-for="log in tab.logging.sort((a, b) => a.stepCount - b.stepCount)" :key="log">
+                        <td>{{ utcDateToLocal(log.dateTime) }}</td>
+                        <td>{{ log.stepId }}</td>
+                        <td>
+                            <span>{{log.label}}</span>
+                            <span>({{ log.type }})</span>
+                        </td>
+                        <td>
+                            <ul>
+                                <li v-for="logmessage in log.messages" :key="logmessage">
+                                    <span v-html="displayText(logmessage)"></span>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </template>
@@ -87,6 +91,17 @@ const displayText = function (text) {
     overflow: auto;
     animation: modalentry 0.5s;
     user-select: text;
+}
+.background .modal .modal-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 50px;
+}
+.background .modal .modal-content {
+    position: relative;
+    display: flex;
+    overflow: auto;
 }
 table {
     width: fit-content !important;

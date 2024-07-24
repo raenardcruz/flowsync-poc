@@ -1,9 +1,9 @@
 <template>
-    <div class="custom-node" :id="id" :class="(node.selected ? 'node-selected ' : ' ') + node.data.status" @click="nodeClicked" @mouseenter="nodeHover" @mouseleave="showLog = false">
-        <div class="status" v-if="node.data.status.length > 0">
-            <span class="material-symbols-outlined running" v-if="node.data.status == 'running'">cached</span>
-            <span class="material-symbols-outlined success" v-if="node.data.status == 'success'">check</span>
-            <span class="material-symbols-outlined failed" v-if="node.data.status == 'failed'">error</span>
+    <div class="custom-node" :id="id" :class="(node.selected ? 'node-selected ' : ' ') + nodeStatus" @click="nodeClicked" @mouseenter="nodeHover" @mouseleave="showLog = false">
+        <div class="status" v-if="nodeStatus.length > 0">
+            <span class="material-symbols-outlined running" v-if="nodeStatus == 'running'">cached</span>
+            <span class="material-symbols-outlined success" v-if="nodeStatus == 'success'">check</span>
+            <span class="material-symbols-outlined failed" v-if="nodeStatus == 'failed'">error</span>
         </div>
         <div class="header">
             <div class="title">
@@ -66,6 +66,13 @@ const props = defineProps(['id', 'type'])
 const { tabs } = store()
 var tab = tabs.value.find(f => f.id == node.tabId)
 var log = computed(() => tab.logging.find(f => f.stepId == props.id));
+var nodeStatus = computed(() => {
+    var statusResults = tab.statuses.filter(f => f.id == node.id);
+    if (statusResults.length > 0) {
+        return statusResults[0].status;
+    } else
+        return ""
+})
 
 onNodeDragStop((event) => {
     if (event.node.id == props.id) {

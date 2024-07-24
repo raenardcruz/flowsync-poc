@@ -29,7 +29,7 @@ const filteredProcesses = computed(() => {
 })
 var tab = tabs.value.find(f => f.id == node.tabId)
 const viewProcess = function () {
-    selectTab(node.data.value, true, tab.logging)
+    selectTab(node.data.value, true, tab.logging, tab.statuses, tab.logPaths)
 }
 </script>
 

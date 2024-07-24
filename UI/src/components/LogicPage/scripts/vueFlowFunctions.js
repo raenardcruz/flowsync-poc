@@ -7,6 +7,7 @@ const { processes, activeTab, tabs } = store()
 
 const save = (tab, notify) => {
     var payload = copyObj(tab);
+    console.log(tab.edges)
     payload.components = JSON.stringify({
         nodes: tab.nodes,
         edges: tab.edges,
@@ -50,6 +51,7 @@ const deleteProcess = (tab, confirmation, notify) => {
 const quickrun = (tab, notify) => {
     tab.runMode = true;
     tab.logging = [];
+    tab.logPaths = [];
 
     tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "")
     var payload = {
@@ -68,7 +70,7 @@ const quickrun = (tab, notify) => {
 }
 
 const exitRunMode = (tab) => {
-    tab.nodes.filter(f => f.id != "1").forEach(node => node.data.status = "");
+    tab.statuses = [];
     tab.runMode = false;
 }
   

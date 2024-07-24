@@ -15,6 +15,8 @@ const defaultTab = {
     eventName: "",
     isNew: true,
     logging: [],
+    logPaths: [],
+    statuses: [],
     runComplete: false,
     showLogModal: false,
     runMode: false,

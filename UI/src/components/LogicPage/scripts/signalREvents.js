@@ -9,10 +9,13 @@ export default class SignalREvents {
     initializeEvents = () => {
         signalRConnection.on("stepProgress", (runID, stepId, status) => {
             if (this.tab.id == runID) {
-              var noderesult = this.tab.nodes.filter(f => f.id == stepId);
-              if (noderesult.length > 0) {
-                var node = noderesult[0];
-                node.data.status = status
+              if (this.tab.statuses.filter(f => f.id == stepId).length > 0) {
+                this.tab.statuses.filter(f => f.id == stepId)[0].status = status
+              } else {
+                this.tab.statuses.push({
+                  id: stepId,
+                  status: status
+                })
               }
             }
         });
@@ -21,6 +24,14 @@ export default class SignalREvents {
               this.tab.logging.push(log);
             }
         });
+        signalRConnection.on("logPath", (runId, source, target) => {
+          if (this.tab.id == runId) {
+            this.tab.logPaths.push({
+              target: target,
+              source: source
+            });
+          }
+      });
         signalRConnection.on("processComplete", (runID) => {
             if (this.tab.id == runID) {
               this.tab.runComplete = true;

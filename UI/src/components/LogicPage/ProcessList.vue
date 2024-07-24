@@ -5,6 +5,10 @@
             <div class="filter-search">
                 <input class="search-box" type="search" placeholder="Search" v-model="searchTags">
             </div>
+            <div class="tag-actions">
+                <div class="tag-btn" @click="selectAllTag">Check All</div>
+                <div class="tag-btn" @click="deselectAllTag">Uncheck All</div>
+            </div>
             <div class="filter-checks">
                 <span v-for="tag in filteredTags" :key="tag.name">
                     <CheckBox class="check" :label="tag.name" v-model="tag.value" />
@@ -66,10 +70,9 @@
 
 <script setup>
 import CheckBox from "../Common/CheckBox.vue";
-import { copyObj } from "../scripts/helper";
 import store from "../store"
-import { getAllProcesses, selectTab, newProcess } from "./scripts/functions"
-import { ref, computed, watch } from "vue"
+import { getAllProcesses, selectTab, newProcess, selectAllTag, deselectAllTag } from "./scripts/functions"
+import { ref, computed } from "vue"
 
 const { processes, tags } = store();
 const search = ref("")
@@ -159,7 +162,7 @@ getAllProcesses();
     justify-content: flex-start;
     align-self: flex-start;
     flex-direction: column;
-    margin-top: 30px;
+    margin-top: 10px;
 }
 .filter-box .filter-checks .check {
     margin-top: 10px;
@@ -190,6 +193,7 @@ getAllProcesses();
     position: relative;
     display: flex;
     width: 100%;
+    max-width: 700px;
     height: 30px;
     border-radius: 20px;
     margin-top: 30px;
@@ -279,5 +283,29 @@ getAllProcesses();
     background: #3489CD;
     border-radius: 20px;
     color: #fff;
+}
+.tag-actions {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.tag-actions .tag-btn {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    padding: 1px 10px 1px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #ffffff;
+    transition: all 0.3s linear;
+}
+.tag-actions .tag-btn:hover {
+    box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #ffffff;
 }
 </style>

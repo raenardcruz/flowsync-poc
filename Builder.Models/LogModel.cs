@@ -1,5 +1,6 @@
 ﻿public class LogModel
 {
+    public int stepCount { get; set; }
     public string runId { get; set; }
     public string stepId { get; set; }
     public string label { get; set; }
